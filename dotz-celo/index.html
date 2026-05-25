@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+  <title>DOTZ · On-Chain Celo</title>
+  <link rel="stylesheet" href="/style.css"/>
+</head>
+<body>
+
+<!-- ── LOADING ── -->
+<div id="loading">
+  <div class="logo">DOTZ</div>
+  <div class="sub">ON-CHAIN · CELO · PVP</div>
+  <div class="spinner yellow"></div>
+</div>
+
+<!-- ── TOP BAR ── -->
+<div id="topbar">
+  <div class="tb-logo">DOTZ</div>
+  <div class="tb-right">
+    <div id="minipay-badge" class="minipay-tag" style="display:none">🟡 MiniPay</div>
+    <div class="chain-tag" id="chain-tag-display">CELO</div>
+    <button id="wb-btn" onclick="openWalletModal()">CONNECT</button>
+  </div>
+</div>
+
+<!-- ── TESTNET WARNING ── -->
+<div id="testnet-warning" style="display:none;position:fixed;top:46px;left:0;right:0;background:rgba(252,255,82,.07);border-bottom:1px solid rgba(252,255,82,.2);padding:8px;text-align:center;font-size:.58rem;color:var(--yellow);z-index:99;letter-spacing:.05em">
+  ⚠️ TESTNET — Celo Alfajores — Use test CELO only
+</div>
+
+<!-- ── WALLET MODAL ── -->
+<div class="overlay" id="wallet-modal">
+  <div class="modal">
+    <button class="modal-x" onclick="closeWalletModal()">✕</button>
+    <div class="modal-title" id="wm-title">CONNECT</div>
+    <div class="modal-sub">Play DOTZ on the Celo blockchain</div>
+
+    <!-- Disconnected state -->
+    <div id="wm-disconnected">
+      <div class="wallet-option-row">
+        <!-- MiniPay -->
+        <div class="wallet-option" onclick="connectWallet()">
+          <div class="wo-icon">🟡</div>
+          <div class="wo-label">MiniPay</div>
+          <div class="wo-sub">Opera Mini wallet</div>
+        </div>
+        <!-- Any wallet -->
+        <div class="wallet-option" onclick="connectWallet()">
+          <div class="wo-icon">🦊</div>
+          <div class="wo-label">Any Wallet</div>
+          <div class="wo-sub">MetaMask, Rainbow…</div>
+        </div>
+      </div>
+
+      <!-- No wallet help -->
+      <div id="wm-no-wallet-help" style="display:none;margin-top:10px">
+        <div class="info-row" style="text-align:center">
+          <div style="font-size:.58rem;color:var(--muted);line-height:1.6">
+            No wallet detected.<br>
+            Use <strong style="color:var(--yellow)">Opera Mini + MiniPay</strong> on mobile<br>
+            or install <strong style="color:var(--yellow)">MetaMask</strong> browser extension.
+          </div>
+        </div>
+      </div>
+
+      <div class="info-row" style="margin-top:10px">
+        <div class="ir-lbl">NETWORK</div>
+        <div class="ir-val">🌿 Celo — Near-zero gas fees</div>
+      </div>
+      <div class="info-row">
+        <div class="ir-lbl">FREE PVP</div>
+        <div class="ir-val">Match start recorded on-chain</div>
+      </div>
+      <div class="info-row">
+        <div class="ir-lbl">NO WALLET?</div>
+        <div class="ir-val">Still play vs Bot — no wallet needed</div>
+      </div>
+
+      <button class="btn btn-primary btn-full" style="margin-top:14px" onclick="connectWallet()">
+        🌿 CONNECT WALLET
+      </button>
+    </div>
+
+    <!-- Connected state -->
+    <div id="wm-connected" style="display:none">
+      <div class="info-row" style="cursor:pointer" onclick="copyWalletAddr()" title="Click to copy">
+        <div class="ir-lbl">WALLET</div>
+        <div class="ir-val" id="wm-addr-full">—</div>
+      </div>
+      <div class="info-row">
+        <div class="ir-lbl">USERNAME</div>
+        <div class="ir-val" id="wm-username-display">—</div>
+      </div>
+      <div class="info-row">
+        <div class="ir-lbl">NETWORK</div>
+        <div class="ir-val" id="wm-network-label">Celo Mainnet</div>
+      </div>
+      <div class="info-row">
+        <div class="ir-lbl">BALANCE</div>
+        <div class="ir-val" id="wm-bal">…</div>
+      </div>
+      <div class="info-row" id="wm-wallet-type" style="display:none">
+        <div class="ir-lbl">WALLET TYPE</div>
+        <div class="ir-val">—</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn btn-ghost btn-full" onclick="closeWalletModal()">CLOSE</button>
+        <button class="btn btn-full" onclick="disconnectWallet();closeWalletModal();"
+          style="background:rgba(255,60,60,.08);border:1px solid rgba(255,60,60,.3);color:#ff6060;font-size:.62rem">
+          DISCONNECT
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── USERNAME MODAL (first-time registration) ── -->
+<div class="overlay" id="username-modal">
+  <div class="modal">
+    <div class="modal-title" style="color:var(--yellow)">CHOOSE NAME</div>
+    <div class="modal-sub">Register your username on Celo blockchain — permanent &amp; yours forever.</div>
+
+    <div class="info-row" style="background:rgba(252,255,82,.05);border-color:rgba(252,255,82,.2)">
+      <div style="font-size:.56rem;color:var(--muted);line-height:1.6">
+        🌿 One-time on-chain transaction · Near-zero gas on Celo<br>
+        3–16 chars · Letters, numbers, underscore only
+      </div>
+    </div>
+
+    <input
+      id="username-input"
+      type="text"
+      maxlength="16"
+      placeholder="e.g. CeloKing99"
+      autocomplete="off"
+      style="
+        width:100%; margin:14px 0 6px;
+        background:var(--surface2); border:1px solid rgba(252,255,82,.3);
+        border-radius:4px; padding:12px 14px;
+        font-family:var(--font-mono); font-size:.85rem; color:var(--yellow);
+        outline:none; text-align:center; letter-spacing:.08em;
+      "
+      oninput="this.value=this.value.replace(/[^A-Za-z0-9_]/g,'')"
+      onkeydown="if(event.key==='Enter') submitUsername()"
+    />
+    <div id="username-error" style="display:none;color:#ff6060;font-size:.58rem;text-align:center;margin-bottom:8px"></div>
+
+    <button id="username-submit-btn" class="btn btn-primary btn-full" onclick="submitUsername()">
+      REGISTER ON CELO 🌿
+    </button>
+    <button class="btn btn-ghost btn-full" style="margin-top:7px;font-size:.62rem" onclick="closeUsernameModal()">
+      SKIP FOR NOW
+    </button>
+  </div>
+</div>
+
+<!-- ── COMING SOON MODAL ── -->
+<div class="overlay" id="coming-soon-modal">
+  <div class="modal" style="text-align:center">
+    <button class="modal-x" onclick="closeComingSoonModal()">✕</button>
+    <div style="font-size:2.5rem;margin-bottom:10px">🚧</div>
+    <div class="modal-title" style="color:var(--yellow)">COMING SOON</div>
+    <div id="cs-feature-label" style="font-size:.65rem;color:var(--muted);margin:10px 0 4px;letter-spacing:.1em">
+      This feature
+    </div>
+    <div style="font-size:.6rem;color:var(--muted);margin-bottom:18px;line-height:1.6">
+      is being built on Celo.<br>Stay tuned for the next update!
+    </div>
+    <button class="btn btn-primary btn-full" onclick="closeComingSoonModal()">GOT IT</button>
+  </div>
+</div>
+
+<!-- ── HOME ── -->
+<div class="screen active" id="home-screen">
+  <div class="home-hero">
+    <div class="hero-title">DOTZ</div>
+    <div class="hero-sub">ON-CHAIN · CELO · PVP</div>
+    <div class="hero-dots">
+      <div class="hd y"></div><div class="hd y"></div><div class="hd k"></div>
+      <div class="hd k"></div><div class="hd y"></div><div class="hd y"></div>
+      <div class="hd k"></div><div class="hd y"></div><div class="hd k"></div>
+    </div>
+  </div>
+
+  <!-- Free PvP — active -->
+  <button class="btn btn-free" onclick="handleFreePvP()">
+    🎮 FREE PVP — ON CELO CHAIN
+  </button>
+
+  <!-- Practice Bot — active -->
+  <button class="btn btn-bot" onclick="startBot()">
+    🤖 PRACTICE VS BOT
+  </button>
+
+  <!-- Staked PvP — coming soon -->
+  <button class="btn btn-coming" onclick="handleComingSoon('Staked PVP (0.002 CELO)')">
+    ⚔ STAKED PVP
+    <span class="cs-pill">SOON</span>
+  </button>
+
+  <!-- Invite Friend — coming soon -->
+  <button class="btn btn-coming" onclick="handleComingSoon('Invite a Friend')">
+    🔗 INVITE FRIEND
+    <span class="cs-pill">SOON</span>
+  </button>
+
+  <!-- Join by Code — coming soon -->
+  <button class="btn btn-coming" onclick="handleComingSoon('Join by Code')">
+    🎯 JOIN BY CODE
+    <span class="cs-pill">SOON</span>
+  </button>
+
+  <div class="home-stats">
+    <div class="hs"><div class="hs-v" id="s-matches">—</div><div class="hs-l">MATCHES PLAYED</div></div>
+    <div class="hs"><div class="hs-v" id="s-network">CELO</div><div class="hs-l">NETWORK</div></div>
+  </div>
+
+  <div class="celo-badge">
+    <svg viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="25" cy="25" r="25" fill="#FCFF52"/>
+      <circle cx="25" cy="25" r="13" fill="#111111"/>
+      <circle cx="25" cy="12" r="5" fill="#FCFF52"/>
+      <circle cx="38" cy="38" r="5" fill="#35D07F"/>
+    </svg>
+    <span>POWERED BY CELO</span>
+  </div>
+</div>
+
+<!-- ── FREE MATCHMAKING ── -->
+<div class="screen" id="free-mm-screen">
+  <div class="mm-card">
+    <div style="margin-bottom:8px">
+      <span class="free-badge">🌿 FREE PVP · ON CELO CHAIN</span>
+    </div>
+    <div class="mm-card-title" style="color:var(--yellow)">FINDING MATCH</div>
+    <div class="mm-card-sub">Match start will be recorded on Celo</div>
+
+    <div class="stake-display" style="border-color:rgba(252,255,82,.15)">
+      <div class="sd-label">ENTRY</div>
+      <div class="sd-amount" style="color:var(--yellow);font-size:1.4rem">FREE 🎉</div>
+      <div class="sd-sub">No stake · Match recorded on-chain</div>
+    </div>
+
+    <div class="players-vs">
+      <div>
+        <div class="pav p1" id="fmm-p1">YOU</div>
+        <div class="pav-name">YOU</div>
+      </div>
+      <div class="vs-txt">VS</div>
+      <div>
+        <div class="pav wait" id="fmm-p2">?</div>
+        <div class="pav-name" id="fmm-opp">FINDING</div>
+      </div>
+    </div>
+
+    <div id="fmm-status">
+      <div class="spinner yellow"></div>
+      <div class="mm-txt">SEARCHING…</div>
+    </div>
+
+    <!-- Grid size picker -->
+    <div class="sz-row">
+      <div class="sz-opt sel" data-fn="4" onclick="pickFreeSize(4)">4×4<br><span style="font-size:.46rem">QUICK</span></div>
+      <div class="sz-opt"    data-fn="5" onclick="pickFreeSize(5)">5×5<br><span style="font-size:.46rem">CLASSIC</span></div>
+      <div class="sz-opt"    data-fn="6" onclick="pickFreeSize(6)">6×6<br><span style="font-size:.46rem">PRO</span></div>
+    </div>
+
+    <button class="btn btn-danger btn-sm" style="margin:0 auto" onclick="cancelFreeMM()">CANCEL</button>
+  </div>
+</div>
+
+<!-- ── GAME ── -->
+<div class="screen" id="game-screen">
+  <div class="game-top">
+    <div class="scores">
+      <div class="sc mine active" id="sc-me">
+        <div class="sc-nm" id="sc-me-nm">YOU</div>
+        <div class="sc-v"  id="sc-me-v">0</div>
+      </div>
+      <div class="sc theirs" id="sc-op">
+        <div class="sc-nm" id="sc-op-nm">OPP</div>
+        <div class="sc-v"  id="sc-op-v">0</div>
+      </div>
+    </div>
+    <div class="turn-info">
+      <span class="t-pip" id="t-pip" style="background:var(--yellow)"></span>
+      <span id="t-lbl">YOUR TURN</span>
+    </div>
+    <div class="pot-tag" id="pot-tag" style="display:none">🌿 CELO</div>
+  </div>
+
+  <div class="canvas-wrap"><canvas id="C"></canvas></div>
+
+  <div class="game-bot">
+    <button class="btn btn-ghost btn-sm" onclick="quitGame()">QUIT</button>
+    <button class="btn btn-ghost btn-sm" id="undo-btn" onclick="doUndo()" style="display:none">↩ UNDO</button>
+  </div>
+</div>
+
+<!-- ── RESULT ── -->
+<div class="screen" id="result-screen">
+  <div class="result-card" id="r-card">
+    <div class="r-icon"  id="r-icon">🏆</div>
+    <div class="r-title" id="r-title">WIN</div>
+    <div class="r-sub"   id="r-sub">0 — 0 boxes</div>
+
+    <!-- On-chain badge -->
+    <div id="r-chain-badge" style="display:none;font-size:.55rem;color:var(--yellow);background:rgba(252,255,82,.06);border:1px solid rgba(252,255,82,.2);border-radius:3px;padding:5px 10px;margin:8px 0;text-align:center;letter-spacing:.06em"></div>
+
+    <button class="btn btn-primary btn-full" style="margin-bottom:7px" onclick="playAgain()">PLAY AGAIN</button>
+    <button class="btn btn-ghost   btn-full" style="margin-bottom:7px" onclick="showScreen('home-screen')">🏠 HOME</button>
+    <button class="btn btn-ghost   btn-full" style="font-size:.6rem"   onclick="doShare()">📤 SHARE RESULT</button>
+  </div>
+</div>
+
+<!-- ── TOAST + CONFETTI ── -->
+<div class="toast" id="toast"></div>
+<div id="confetti" style="position:fixed;inset:0;pointer-events:none;z-index:997"></div>
+
+<!-- ── SCRIPTS (order matters) ── -->
+<script src="https://cdn.ably.com/lib/ably.min-2.js"></script>
+<!-- CONFIG first -->
+<script src="/config.js"></script>
+<script src="/contract.js"></script>
+<script src="/wallet.js"></script>
+<script src="/game.js"></script>
+<script src="/matchmaking.js"></script>
+<script src="/ui.js"></script>
+
+<!-- Load on-chain stats on home screen -->
+<script>
+  window.addEventListener('load', () => {
+    setTimeout(async () => {
+      try {
+        const total = await matchGetTotal();
+        const el = document.getElementById('s-matches');
+        if (el && total > 0) el.textContent = total.toLocaleString();
+      } catch(e) {}
+    }, 2000);
+  });
+</script>
+
+</body>
+</html>

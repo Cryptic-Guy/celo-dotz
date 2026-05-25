@@ -1,0 +1,14 @@
+{
+  "name": "dotz-celo",
+  "version": "2.0.0",
+  "description": "On-chain Dots & Boxes on Celo — Proof of Ship May 2025",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 8080",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 8080"
+  },
+  "dependencies": {
+    "vite": "^5.0.0"
+  }
+}
